@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--    添加数据源-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driverClass}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--
+           由Spring来管理事务
+                Spring管理事务，有一个特征： 就是由管理员来管理事务
+                  管理员是谁，得看dao层使用的技术来决定。
+                     如果dao层使用的技术是 jdbc|mybatis  ======= DataSourceTransactionManager
+                     如果dao层使用的技术是 hibernate  ========= HibernateTransactionManager
+                操作事务需要用到连接对象，所以要把DataSource对象给注入进来
+          -->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+<!--        注入数据源-->
+        <property name="dataSource" ref="dataSource"/>
+
+<!--        起别名-->
+        <property name="typeAliasesPackage" value="com.move.pojo"/>
+    </bean>
+
+<!--让spring接管扫描dao映射文件-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.move.dao"/>
+
+    </bean>
+
+
+</beans>
